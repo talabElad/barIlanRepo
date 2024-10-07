@@ -1,0 +1,27 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-biuclinicspschy-dev-e3057-authRole",
+      "UnauthRoleArn": "arn:aws:iam::891377291362:role/amplify-biuclinicspschy-dev-e3057-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::891377291362:role/amplify-biuclinicspschy-dev-e3057-authRole",
+      "Region": "eu-central-1",
+      "DeploymentBucketName": "amplify-biuclinicspschy-dev-e3057-deployment",
+      "UnauthRoleName": "amplify-biuclinicspschy-dev-e3057-unauthRole",
+      "StackName": "amplify-biuclinicspschy-dev-e3057",
+      "StackId": "arn:aws:cloudformation:eu-central-1:891377291362:stack/amplify-biuclinicspschy-dev-e3057/a0802380-847f-11ef-bd77-0a63de0ddfab",
+      "AmplifyAppId": "d39zcscvaj7ijh",
+      "AuthTriggerTemplateURL": "https://s3.amazonaws.com/amplify-biuclinicspschy-dev-e3057-deployment/amplify-cfn-templates/auth/auth-trigger-cloudformation-template.json"
+    },
+    "categories": {
+      "auth": {
+        "biuclinicspschy05177164": {}
+      },
+      "function": {
+        "biuclinicspschy05177164PreTokenGeneration": {
+          "deploymentBucketName": "amplify-biuclinicspschy-dev-e3057-deployment",
+          "s3Key": "amplify-builds/biuclinicspschy05177164PreTokenGeneration-5548594558356b6d4d49-build.zip"
+        }
+      }
+    }
+  }
+}
