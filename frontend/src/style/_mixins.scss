@@ -1,0 +1,44 @@
+// Directions
+@mixin ltr {
+	html:not([dir="rtl"]) & {
+		@content;
+	}
+}
+
+@mixin rtl {
+	html[dir="rtl"] & {
+		@content;
+	}
+}
+
+// Placeholder
+@mixin placeholder {
+	&.placeholder {
+		@content;
+	}
+	&::-webkit-input-placeholder {
+		@content;
+	}
+	&:-moz-placeholder {
+		@content;
+	}
+	&::-moz-placeholder {
+		@content;
+	}
+	&:-ms-input-placeholder {
+		@content;
+	}
+}
+
+// Ellipsis
+@mixin ellip($rows: 1) {
+	overflow: hidden;
+	-webkit-line-clamp: $rows;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+}
+
+@mixin fullWidth {
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+}
