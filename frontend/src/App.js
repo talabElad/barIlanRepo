@@ -15,6 +15,7 @@ const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState('');
+  const [userRole, setUserRole] = useState('');
 
   useEffect(() => {
     const checkUserSession = async () => {
@@ -30,8 +31,10 @@ const App = () => {
             console.log("ID Token:", session.tokens.idToken);
             console.log("Refresh Token:", session.tokens.refreshToken);
             console.log("user: ", session.tokens.idToken.payload.name);
+            console.log("groups: ", session.tokens.idToken.payload['cognito:groups']);
 
             setUserName(session.tokens.idToken.payload.name);
+            setUserRole(session.tokens.idToken.payload['cognito:groups']);
           }
           
           setIsAuthenticated(true);
@@ -61,7 +64,7 @@ const App = () => {
           <Route path="/" element={isAuthenticated ? <Navigate to="/homepage" /> : <Login />} />
           <Route
             path="/homepage"
-            element={isAuthenticated ? <HomePage isAuthenticated={isAuthenticated} /> : <Navigate to="/" />}
+            element={isAuthenticated ? <HomePage isAuthenticated={isAuthenticated} userRole={userRole} /> : <Navigate to="/" />}
           />
         </Routes>
         <Footer />
