@@ -33,7 +33,15 @@ header {
             filter: brightness(0) invert(1);
         }
     }
-    .logout {
+    .auth-wrap {
+        .inner {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        span {
+            color: white;
+        }
         button {
             background-color: $bg;
             color: $green;
