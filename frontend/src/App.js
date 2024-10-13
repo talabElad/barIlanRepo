@@ -27,11 +27,11 @@ const App = () => {
           
           // Log token details
           if (session && session.tokens) {
-            console.log("Access Token:", session.tokens.accessToken);
-            console.log("ID Token:", session.tokens.idToken);
-            console.log("Refresh Token:", session.tokens.refreshToken);
-            console.log("user: ", session.tokens.idToken.payload.name);
-            console.log("groups: ", session.tokens.idToken.payload['cognito:groups']);
+            // console.log("Access Token:", session.tokens.accessToken);
+            // console.log("ID Token:", session.tokens.idToken);
+            // console.log("Refresh Token:", session.tokens.refreshToken);
+            // console.log("user: ", session.tokens.idToken.payload.name);
+            // console.log("groups: ", session.tokens.idToken.payload['cognito:groups']);
 
             setUserName(session.tokens.idToken.payload.name);
             setUserRole(session.tokens.idToken.payload['cognito:groups']);
