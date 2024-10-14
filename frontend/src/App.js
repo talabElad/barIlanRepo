@@ -5,6 +5,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import Login from './components/Login';
 import HomePage from './components/HomePage';
+import AdminSearch from './components/AdminSearch';
 import { Amplify } from 'aws-amplify';
 import { fetchAuthSession, getCurrentUser } from 'aws-amplify/auth';
 import awsconfig from './aws-exports';
@@ -22,23 +23,12 @@ const App = () => {
       try {
         const user = await getCurrentUser();
         if (user) {
-          
           const session = await fetchAuthSession();
-          
-          // Log token details
           if (session && session.tokens) {
-            console.log("Access Token:", session.tokens.accessToken);
-            console.log("ID Token:", session.tokens.idToken);
-            console.log("Refresh Token:", session.tokens.refreshToken);
-            console.log("user: ", session.tokens.idToken.payload.name);
-            console.log("groups: ", session.tokens.idToken.payload['cognito:groups']);
-
             setUserName(session.tokens.idToken.payload.name);
-            setUserRole(session.tokens.idToken.payload['cognito:groups']);
+            setUserRole(session.tokens.idToken.payload['cognito:groups'] || []);
           }
-          
           setIsAuthenticated(true);
-          
         } else {
           setIsAuthenticated(false);
         }
@@ -59,12 +49,22 @@ const App = () => {
   return (
     <Router>
       <main>
-        <Header isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} userName={userName} />
+        <Header isAuthenticated={isAuthenticated} onLogout={() => setIsAuthenticated(false)} userName={userName} userRole={userRole} />
         <Routes>
           <Route path="/" element={isAuthenticated ? <Navigate to="/homepage" /> : <Login />} />
           <Route
             path="/homepage"
             element={isAuthenticated ? <HomePage isAuthenticated={isAuthenticated} userRole={userRole} /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/admin-search"
+            element={
+              isAuthenticated && userRole.includes('Admins') ? (
+                <AdminSearch />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
           />
         </Routes>
         <Footer />

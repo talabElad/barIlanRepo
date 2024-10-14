@@ -20,4 +20,5 @@ amplifytools.xcconfig
 .secret-*
 **.sample
 backend/.idea/
+.env
 #amplify-do-not-edit-end

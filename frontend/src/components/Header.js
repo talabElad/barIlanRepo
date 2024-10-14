@@ -3,7 +3,7 @@ import { signInWithRedirect, signOut } from 'aws-amplify/auth';
 import { Link } from 'react-router-dom';
 import '../style/Header.scss'; // Adjust your styles accordingly
 
-const Header = ({ isAuthenticated, onLogout, userName }) => {
+const Header = ({ isAuthenticated, onLogout, userName, userRole }) => {
   const handleLogin = async () => {
     try {
       await signInWithRedirect(); // Redirect to Cognito for authentication
@@ -24,13 +24,16 @@ const Header = ({ isAuthenticated, onLogout, userName }) => {
 
   return (
     <header>
-
-
       <div className="auth-wrap">
         {isAuthenticated ? (
-          <div className='inner'><button onClick={handleLogout}>Logout</button><span>Welcome, {userName}</span></div>
+          <div className='inner'>
+            <button onClick={handleLogout}>Logout</button>
+            <span>Welcome, {userName}</span>
+          </div>
         ) : (
-          <div className='inner'><button onClick={handleLogin}>Login</button></div>
+          <div className='inner'>
+            <button onClick={handleLogin}>Login</button>
+          </div>
         )}
       </div>
       <div className='logo'>
@@ -38,7 +41,10 @@ const Header = ({ isAuthenticated, onLogout, userName }) => {
       </div>
       <nav>
         <ul>
-          <li><Link to="/">Link example</Link></li>
+          <li><Link to="/">Home</Link></li>
+          {userRole && userRole.includes('Admins') && ( // Check if user belongs to 'admin' group
+            <li><Link to="/admin-search">Admin Search</Link></li>
+          )}
         </ul>
       </nav>
     </header>

@@ -8,8 +8,8 @@ Amplify.configure({
   },
   Storage: {
     AWSS3: {
-      bucket: 'barilanbucket',
-      region: 'us-east-1_yFeAbcXhB',
+      bucket: 'barilan24elad',
+      region: 'us-east-1',
     },
   },
 });
