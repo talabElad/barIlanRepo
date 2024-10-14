@@ -60,6 +60,20 @@
                 }
                 }
             }
+            .title-wrap {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 0.8rem;
+                margin-bottom: 3.4rem;
+                > h2 {
+                    font-size: 3.4rem;
+                    margin: 0;
+                }
+                > span {
+                    font-size: 2.4rem;
+                }
+            }
         }
         .modal {
             position: fixed;
@@ -168,5 +182,25 @@
     .video-item {
         width: 46rem;
         height: 26rem;
+    }
+}
+
+.search-conteiner {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 3rem;
+    input.free-text {
+        padding-inline: 1rem 2rem;
+        padding-block: 1rem;
+        border-radius: 2rem;
+        font-size: 2rem;
+        min-width: 30rem;
+    }
+}
+.filter-status {
+    display: flex;
+    justify-content: center;
+    p {
+        font-size: 1.8rem;
     }
 }

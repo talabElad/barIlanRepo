@@ -9,13 +9,17 @@ const InstructorsList = ({ instructors, onInstructorClick }) => {
 
   return (
     <div className="list-wrap instructors">
-      <h2>Instructors</h2>
-      <input 
-        type="text" 
-        placeholder="Search Instructors..." 
-        value={searchTerm} 
-        onChange={e => setSearchTerm(e.target.value)} 
-      />
+      <div className='title-wrap'>
+        <h2>Instructors</h2>
+        <span>({filteredInstructors.length})</span>
+      </div>
+      <div className='search-conteiner'>
+        <input type="text" className='free-text' placeholder="Search Instructor..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+      </div>
+      {searchTerm && filteredInstructors.length !== instructors.length && (
+        <div className='filter-status'><p>Shown Filtered Results</p></div>
+      )}
+
       <ul>
         {filteredInstructors.map(instructor => (
           <li key={instructor} onClick={() => onInstructorClick(instructor)} className='item'>
