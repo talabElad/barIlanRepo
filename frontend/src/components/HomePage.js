@@ -7,7 +7,6 @@ import VideosList from './lists/VideosList';
 import useStudents from '../hooks/useStudents';
 import usePatients from '../hooks/usePatients';
 import useVideos from '../hooks/useVideos';
-
 import '../style/HomePage.scss';
 
 const HomePage = () => {
@@ -113,10 +112,11 @@ const HomePage = () => {
         </div>
       )}
 
-      {!selectedInstructor && <InstructorsList instructors={instructors} onInstructorClick={handleInstructorClick} />}
-      {selectedInstructor && !selectedStudent && <StudentsList students={students} onStudentClick={handleStudentClick} />}
-      {selectedStudent && !selectedPatient && <PatientsList patients={patients} onPatientClick={handlePatientClick} />}
-      {selectedPatient && <VideosList groupedVideos={groupedVideos} onVideoClick={handleVideoClick} />}
+      {!selectedInstructor && <InstructorsList instructors={instructors} onClickFromHomeInstructor={handleInstructorClick} />}
+      {selectedInstructor && !selectedStudent && <StudentsList students={students} onClickFromHomeStudent={handleStudentClick} />}
+      {selectedStudent && !selectedPatient && <PatientsList patients={patients} onClickFromHomePatient={handlePatientClick} />}
+      {selectedPatient && <VideosList groupedVideos={groupedVideos} onClickFromHomeVideo={handleVideoClick} />}
+      
       {selectedVideo && (
         <div className="modal">
           <div className="modal-content">
@@ -142,16 +142,9 @@ const HomePage = () => {
                     <div key={video.fileKey}>
                       {video.s3Url ? (
                         <>
-                          <video
-                            width="560"
-                            height="315"
-                            src={video.s3Url}
-                            controls
-                            onTimeUpdate={(e) => handleTimeUpdate(e.target.currentTime)}
-                          ></video>
+                          <video width="560" height="315" src={video.s3Url} controls onTimeUpdate={(e) => handleTimeUpdate(e.target.currentTime)}></video>
                           <div className="video-details">
-                          <h4>Video Details:</h4>
-                          {/* {console.log('Checking video:', video)} */}
+                            <h4>Session Details:</h4>
                             <dl>
                               <div className='detail'>
                                 <dt>Room Number:</dt>
@@ -183,7 +176,7 @@ const HomePage = () => {
                           </div>
                         </>
                       ) : (
-                        <p>Video not available.</p>
+                        <p>Session not available.</p>
                       )}
                     </div>
                   )

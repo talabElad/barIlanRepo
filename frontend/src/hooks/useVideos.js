@@ -40,6 +40,7 @@ const useVideos = () => {
 
       
       setVideos(videoList);
+      console.log('Fetched videos:', videoList);
       const grouped = groupVideosBySession(videoList);
       setGroupedVideos(grouped);
 

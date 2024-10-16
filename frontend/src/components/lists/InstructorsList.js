@@ -1,11 +1,22 @@
 import React, { useState } from 'react';
+import InstructorsListItems from '../ListItems/InstructorsListItems';
 
-const InstructorsList = ({ instructors, onInstructorClick }) => {
+const InstructorsList = ({ instructors, onClickFromAdminInstructor, onClickFromHomeInstructor }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredInstructors = instructors.filter(instructor => 
     instructor.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleInstructorClick = (instructorCode) => {
+    // Call the relevant handler based on where the click originated
+    if (onClickFromAdminInstructor) {
+      onClickFromAdminInstructor(instructorCode);
+    }
+    if (onClickFromHomeInstructor) {
+      onClickFromHomeInstructor(instructorCode);
+    }
+  };
 
   return (
     <div className="list-wrap instructors">
@@ -13,21 +24,18 @@ const InstructorsList = ({ instructors, onInstructorClick }) => {
         <h2>Instructors</h2>
         <span>({filteredInstructors.length})</span>
       </div>
-      <div className='search-conteiner'>
-        <input type="text" className='free-text' placeholder="Search Instructor..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+      <div className='search-container'>
+        <div className='free-text-item'>
+          <label htmlFor="freeText"></label>
+          <input type="text" id="freeText" className='free-text' placeholder="Search Instructor..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+        </div>
       </div>
       {searchTerm && filteredInstructors.length !== instructors.length && (
         <div className='filter-status'><p>Shown Filtered Results</p></div>
       )}
 
-      <ul>
-        {filteredInstructors.map(instructor => (
-          <li key={instructor} onClick={() => onInstructorClick(instructor)} className='item'>
-            <div className="folder-img"></div>
-            <span>{instructor}</span>
-          </li>
-        ))}
-      </ul>
+      <InstructorsListItems instructors={filteredInstructors} onInstructorClick={handleInstructorClick} />
+
     </div>
   );
 };

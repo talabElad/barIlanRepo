@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import VideosListItems from '../ListItems/VideosListItems';
 
-const VideosList = ({ groupedVideos, onVideoClick }) => {
+const VideosList = ({ groupedVideos, onClickFromAdminVideo, onClickFromHomeVideo }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
@@ -12,66 +13,65 @@ const VideosList = ({ groupedVideos, onVideoClick }) => {
     return modifiedDate >= new Date(dateFrom) && modifiedDate <= new Date(dateTo);
   };
 
-  // Filtered videos by search term and date range
-  const filteredVideos = Object.entries(groupedVideos).map(([sessionName, sessionVideos]) => ({
-    sessionName,
-    videos: sessionVideos.filter(video =>
-      video.fullVideoName.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      filterByDateRange(video.lastModified)
-    ),
-  })).filter(group => group.videos.length); // Ensure non-empty groups
+  console.log('groupedVideos: ', groupedVideos)
+  
+// Filtered videos by search term and date range
+const filteredVideos = groupedVideos ? Object.entries(groupedVideos).map(([sessionName, sessionVideos]) => ({
+  sessionName,
+  videos: sessionVideos.filter(video =>
+    video.fullVideoName?.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    filterByDateRange(video.lastModified)
+  ),
+})).filter(group => group.videos.length) : [];
+
+
+
+  const handleVideoClick = (patientCode) => {
+    // Call the relevant handler based on where the click originated
+    if (onClickFromAdminVideo) {
+      onClickFromAdminVideo(patientCode);
+    }
+    if (onClickFromHomeVideo) {
+      onClickFromHomeVideo(patientCode);
+    }
+  };
+
 
   return (
     <div className="list-wrap videos">
-      <h2>Videos</h2>
-      {/* Search inputs */}
-      <input 
-        type="text" 
-        placeholder="Search Videos by Name..." 
-        value={searchTerm} 
-        onChange={e => setSearchTerm(e.target.value)} 
-      />
-      <div>
-        <label>From: </label>
-        <input 
-          type="date" 
-          value={dateFrom} 
-          onChange={(e) => setDateFrom(e.target.value)} 
-        />
-        <label>To: </label>
-        <input 
-          type="date" 
-          value={dateTo} 
-          onChange={(e) => setDateTo(e.target.value)} 
-        />
+      <div className='title-wrap'>
+        <h2>Videos</h2>
+        <span>({filteredVideos.length})</span>
       </div>
 
-      {/* Render filtered videos */}
+      <div className='search-container'>
+        <div className='free-text-item'>
+          <label htmlFor="freeText"></label>
+          <input type="text" id="freeText" className='free-text' placeholder="Search session..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+        </div>
+        <div className='dates-wrap'>
+          <div className='date-item'>
+            <label htmlFor="fromDate">From: </label>
+            <input type="date" id="fromDate" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
+          </div>
+          <div className='date-item'>
+            <label htmlFor="toDate">To: </label>
+            <input type="date" id="toDate" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
+          </div>
+        </div>
+      </div>
+      {searchTerm && filteredVideos.length !== groupedVideos.length && (
+        <div className='filter-status'><p>Shown Filtered Results</p></div>
+      )}
       <ul>
-        {filteredVideos.map(({ sessionName, videos }) => (
-          <li key={sessionName}>
-            <h3>{sessionName}</h3>
-            <ul>
-              {videos.map((video) => (
-                <li key={video.fileKey} onClick={() => onVideoClick(video)} className='item'>
-                  <div className="folder-img"></div>
-                  <div className="video-details">
-                    <dl>
-                      <div className='detail'>
-                        <dt>Video Name:</dt>
-                        <dd>{video.fullVideoName}</dd>
-                      </div>
-                      <div className='detail'>
-                        <dt>Last Modified:</dt>
-                        <dd>{new Date(video.lastModified).toLocaleDateString('he-IL')}</dd>
-                      </div>
-                    </dl>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </li>
-        ))}
+      {filteredVideos.map(({ sessionName, videos }) => (
+        
+        <li key={sessionName}>
+          <h3>{sessionName}</h3>
+          
+          <VideosListItems videos={videos} onVideoClick={handleVideoClick} />
+        </li>
+      ))}
       </ul>
     </div>
   );
