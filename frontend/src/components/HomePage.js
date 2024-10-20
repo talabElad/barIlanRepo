@@ -7,6 +7,7 @@ import VideosList from './lists/VideosList';
 import useStudents from '../hooks/useStudents';
 import usePatients from '../hooks/usePatients';
 import useVideos from '../hooks/useVideos';
+import VideoModal from './VideoModal';
 import '../style/HomePage.scss';
 
 const HomePage = () => {
@@ -83,7 +84,7 @@ const HomePage = () => {
   };
 
   const handleVideoClick = (video) => {
-    setSelectedVideo(video.fullVideoName);
+    setSelectedVideo(video);
     setSelectedSession(video.sessionName || '');
   };
 
@@ -111,81 +112,12 @@ const HomePage = () => {
           )}
         </div>
       )}
-
       {!selectedInstructor && <InstructorsList instructors={instructors} onClickFromHomeInstructor={handleInstructorClick} />}
       {selectedInstructor && !selectedStudent && <StudentsList students={students} onClickFromHomeStudent={handleStudentClick} />}
       {selectedStudent && !selectedPatient && <PatientsList patients={patients} onClickFromHomePatient={handlePatientClick} />}
       {selectedPatient && <VideosList groupedVideos={groupedVideos} onClickFromHomeVideo={handleVideoClick} />}
-      
-      {selectedVideo && (
-        <div className="modal">
-          <div className="modal-content">
-            <span className="close" onClick={() => setSelectedVideo(null)}>&times;</span>
-            <div className="tabs">
-              
-              {groupedVideos[selectedSession]?.map((video) => {
-                return (
-                  <button
-                    key={video.fileKey}
-                    className={video.fullVideoName === activeTab ? 'active' : ''}
-                    onClick={() => setActiveTab(video.fullVideoName)}
-                  >
-                    {video.fullVideoName}
-                  </button>
-                );
-              })}
-            </div>
-            <div className="tab-content">
-              {groupedVideos[selectedSession]?.map((video) => {
-                return (
-                  video.fullVideoName === activeTab && (
-                    <div key={video.fileKey}>
-                      {video.s3Url ? (
-                        <>
-                          <video width="560" height="315" src={video.s3Url} controls onTimeUpdate={(e) => handleTimeUpdate(e.target.currentTime)}></video>
-                          <div className="video-details">
-                            <h4>Session Details:</h4>
-                            <dl>
-                              <div className='detail'>
-                                <dt>Room Number:</dt>
-                                <dd>{video.meetingNum}</dd>
-                              </div>
-                              <div className='detail'>
-                                <dt>Meeting Number:</dt>
-                                <dd>{video.roomNum}</dd>
-                              </div>
-                              <div className='detail'>
-                                <dt>Patient Code:</dt>
-                                <dd>{video.patientCode}</dd>
-                              </div>
-                            </dl>
-                            <dl>
-                              <div className='detail'>
-                                <dt>Last Modified:</dt>
-                                <dd>{new Date(video.lastModified).toLocaleDateString('he-IL')}</dd>
-                              </div>
-                              <div className='detail'>
-                                <dt>Therapist Code:</dt>
-                                <dd>{video.therapistCode}</dd>
-                              </div>
-                              <div className='detail'>
-                                <dt>Unique Session Name:</dt>
-                                <dd>{video.uniqueSessionName}</dd>
-                              </div>
-                            </dl>
-                          </div>
-                        </>
-                      ) : (
-                        <p>Session not available.</p>
-                      )}
-                    </div>
-                  )
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
+      {selectedVideo && <VideoModal selectedVideo={selectedVideo} setSelectedVideo={setSelectedVideo} groupedVideos={groupedVideos} selectedSession={selectedSession} activeTab={activeTab} setActiveTab={setActiveTab} handleTimeUpdate={handleTimeUpdate} />
+    }
 
     </div>
   );

@@ -1,10 +1,11 @@
 import React from 'react';
 
 const VideosListItems = ({ videos = [], onVideoClick }) => (
+  console.log('videos: ',videos)
     <ul>
       {videos.length > 0 ? (
         videos.map((video) => (
-          <li key={video.fileKey} onClick={() => onVideoClick(video)} className='item'>
+          <li key={video.fileKey} onClick={() => onVideoClick(video.patientCode, video)} className='item'>
             <div className="folder-img"></div>
             <div className="video-details">
               <dl>

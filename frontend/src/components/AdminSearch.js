@@ -4,24 +4,26 @@ import InstructorsList from './lists/InstructorsList';
 import StudentsList from './lists/StudentsList';
 import PatientsList from './lists/PatientsList';
 import VideosList from './lists/VideosList';
-
 import StudentsListItems from './ListItems/StudentsListItems';
-import useStudents from '../hooks/useStudents';
-
 import PatientsListItems from './ListItems/PatientsListItems';
-import usePatients from '../hooks/usePatients';
-
 import VideosListItems from './ListItems/VideosListItems';
+import useStudents from '../hooks/useStudents';
+import usePatients from '../hooks/usePatients';
 import useVideos from '../hooks/useVideos';
+import VideoModal from './VideoModal';
 //import './AdminSearch.scss';
 
 const AdminSearch = ({ handleStudentClick, handlePatientClick, handleVideoClick }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRole, setSelectedRole] = useState('Instructors');
   const [results, setResults] = useState([]);
+  const [selectedVideo, setSelectedVideo] = useState(null);
+  const [selectedSession, setSelectedSession] = useState(null);
+  const [activeTab, setActiveTab] = useState('');
   const { students, fetchStudents } = useStudents();
   const { patients, fetchPatients } = usePatients();
   const { groupedVideos, fetchVideos } = useVideos();
+  const [videoTimes, setVideoTimes] = useState({});
 
   const handleSearch = async () => {
     const fetchedResults = await queryData(selectedRole, searchTerm);
@@ -41,6 +43,21 @@ const AdminSearch = ({ handleStudentClick, handlePatientClick, handleVideoClick 
       
     }
   }, [groupedVideos, selectedRole]);
+
+    //Effect for handling video tab setup
+    useEffect(() => {
+
+      if (selectedVideo) {
+        if (groupedVideos[selectedSession] || groupedVideos['']) {
+          const sessionVideos = groupedVideos[selectedSession] || groupedVideos[''];
+          if (sessionVideos.length) {
+            setActiveTab(sessionVideos[0].fullVideoName);
+          }
+        } else {
+          console.warn(`No videos found for session: ${selectedSession}`);
+        }
+      }
+    }, [selectedVideo, groupedVideos, selectedSession]);
 
   const queryData = async (role, searchTerm) => {
     let params;
@@ -85,6 +102,20 @@ const AdminSearch = ({ handleStudentClick, handlePatientClick, handleVideoClick 
     }
   };
 
+  const handleTimeUpdate = (videoKey, currentTime) => {
+    console.log(`Video Key: ${videoKey}, Current Time: ${currentTime}`); // Log video key and current time
+    setVideoTimes((prev) => {
+      const newState = {
+        ...prev,
+        [videoKey]: currentTime,
+      };
+      console.log('Updated Video Times:', newState); // Log the updated state
+      return newState;
+    });
+  };
+  
+
+
   const handleItemClick = (instructorCode) => {
     fetchStudents(instructorCode);
     setResults(students);
@@ -102,13 +133,19 @@ const AdminSearch = ({ handleStudentClick, handlePatientClick, handleVideoClick 
     setSelectedRole('Videos');
   };
 
-  const handleItemVideoClick = async (patientCode) => {
-    // setSelectedVideo(video.fullVideoName);
-    // setSelectedSession(video.sessionName || '');
+  const handleItemVideoClick = async (patientCode, video) => {
+    if (!video) {
+      console.error('Video object is undefined');
+      return;
+    }
 
-    await fetchVideos(patientCode);
+    await fetchVideos(video.sessionName || patientCode);
     setResults(groupedVideos);
     setSelectedRole('Videos');
+    
+    // Open VideoModal
+    setSelectedVideo(video.fullVideoName || '');
+    setSelectedSession(video.sessionName || '');
 
   };
 
@@ -142,8 +179,6 @@ const AdminSearch = ({ handleStudentClick, handlePatientClick, handleVideoClick 
         return null;
     }
   };
-
- 
 
   const resetSearch = () => {
     setSearchTerm('');
@@ -185,11 +220,19 @@ const AdminSearch = ({ handleStudentClick, handlePatientClick, handleVideoClick 
         {selectedRole === 'Students' && (
           <PatientsListItems patients={patients} onPatientClick={handleItemPatientClick} />
         )}
-        {/* {selectedRole === 'Patients' && (
-          <VideosListItems videos={videos} onVideoClick={handleItemVideoClick} />
-        )} */}
         {selectedRole === 'Videos' && (
-          <VideosListItems videos={groupedVideos} onVideoClick={handleItemVideoClick} />
+          <VideosListItems groupedVideos={groupedVideos} onVideoClick={handleItemVideoClick} />
+        )}
+        {selectedVideo && (
+          <VideoModal
+            selectedVideo={selectedVideo}
+            setSelectedVideo={setSelectedVideo}
+            groupedVideos={groupedVideos}
+            selectedSession={selectedSession}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            handleTimeUpdate={handleTimeUpdate}
+          />
         )}
 
       </div>

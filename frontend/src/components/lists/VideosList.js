@@ -13,7 +13,6 @@ const VideosList = ({ groupedVideos, onClickFromAdminVideo, onClickFromHomeVideo
     return modifiedDate >= new Date(dateFrom) && modifiedDate <= new Date(dateTo);
   };
 
-  console.log('groupedVideos: ', groupedVideos)
   
 // Filtered videos by search term and date range
 const filteredVideos = groupedVideos ? Object.entries(groupedVideos).map(([sessionName, sessionVideos]) => ({
@@ -26,10 +25,10 @@ const filteredVideos = groupedVideos ? Object.entries(groupedVideos).map(([sessi
 
 
 
-  const handleVideoClick = (patientCode) => {
+  const handleVideoClick = (patientCode, video) => {
     // Call the relevant handler based on where the click originated
     if (onClickFromAdminVideo) {
-      onClickFromAdminVideo(patientCode);
+      onClickFromAdminVideo(patientCode, video);
     }
     if (onClickFromHomeVideo) {
       onClickFromHomeVideo(patientCode);

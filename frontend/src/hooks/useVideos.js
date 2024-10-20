@@ -36,7 +36,7 @@ const useVideos = () => {
           lastModified: metadata ? metadata.LastModified : 'Unknown',
         };
         
-      }));
+      }) || []);
 
       
       setVideos(videoList);

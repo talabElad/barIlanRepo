@@ -15,7 +15,7 @@ const usePatients = () => {
     
       try {
         const data = await dynamoDB.query(params).promise();
-        const patientCodes = data.Items.map(item => item.patient_code);
+        const patientCodes = data.Items.map(item => item.patient_code) || [];
         const uniquePatients = [...new Set(patientCodes)];
         setPatients(uniquePatients);
       } catch (error) {

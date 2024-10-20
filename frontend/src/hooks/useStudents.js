@@ -16,7 +16,7 @@ const useStudents = () => {
 
     try {
       const data = await dynamoDB.query(params).promise();
-      const studentCodes = data.Items.map(item => item['therapist_code_student ']);
+      const studentCodes = data.Items.map(item => item['therapist_code_student ']) || [];
       setStudents(studentCodes);
     } catch (error) {
       console.error('Error fetching students:', error);
