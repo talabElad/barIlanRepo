@@ -1,7 +1,7 @@
 import React from 'react';
 
 const VideosListItems = ({ videos = [], onVideoClick }) => (
-  console.log('videos: ',videos)
+  
     <ul>
       {videos.length > 0 ? (
         videos.map((video) => (
