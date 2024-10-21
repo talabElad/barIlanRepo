@@ -55,10 +55,12 @@ const VideoModal = ({ selectedVideo, setSelectedVideo, groupedVideos, selectedSe
                         </div>
                       </dl>
                       <dl>
+                      {video.lastModified && video.lastModified !== 'unknown' && (
                         <div className='detail'>
-                          <dt>Last Modified:</dt>
-                          <dd>{new Date(video.lastModified).toLocaleDateString('he-IL')}</dd>
+                            <dt>Last Modified:</dt>
+                            <dd>{new Date(video.lastModified).toLocaleDateString('he-IL')}</dd>
                         </div>
+                        )}
                         <div className='detail'>
                           <dt>Therapist Code:</dt>
                           <dd>{video.therapistCode}</dd>

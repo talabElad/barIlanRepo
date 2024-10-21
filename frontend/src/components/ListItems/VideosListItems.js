@@ -5,7 +5,7 @@ const VideosListItems = ({ videos = [], onVideoClick }) => (
     <ul>
       {videos.length > 0 ? (
         videos.map((video) => (
-          <li key={video.fileKey} onClick={() => onVideoClick(video.patientCode, video)} className='item'>
+          <li key={`${video.fullVideoName}-${video.fileKey}`} onClick={() => onVideoClick(video.patientCode, video)} className='item'>
             <div className="folder-img"></div>
             <div className="video-details">
               <dl>
@@ -13,10 +13,12 @@ const VideosListItems = ({ videos = [], onVideoClick }) => (
                   <dt>Video Name:</dt>
                   <dd>{video.fullVideoName}</dd>
                 </div>
-                <div className='detail'>
-                  <dt>Last Modified:</dt>
-                  <dd>{new Date(video.lastModified).toLocaleDateString('he-IL')}</dd>
-                </div>
+                {video.lastModified && video.lastModified !== 'unknown' && (
+                  <div className='detail'>
+                    <dt>Last Modified:</dt>
+                    <dd>{new Date(video.lastModified).toLocaleDateString('he-IL')}</dd>
+                  </div>
+                )}
               </dl>
             </div>
           </li>

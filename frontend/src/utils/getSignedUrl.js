@@ -14,6 +14,12 @@ const s3 = new AWS.S3({
   });
 
   export const getSignedUrl = async (fileKey) => {
+
+    if (!fileKey || fileKey.trim() === '') {
+      console.error('Invalid fileKey provided:', fileKey);
+      return null;
+    }
+
     const params = {
       Bucket: 'arn:aws:s3:us-east-1:637423566007:accesspoint/barilanaccesspoint',
       Key: fileKey,

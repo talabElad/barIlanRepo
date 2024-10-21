@@ -9,7 +9,7 @@
         height: 100%;
         padding: 6rem 8rem 4rem;
         .list-wrap {
-            width: 100rem;
+            width: 102rem;
             margin: 0 auto;
             h1, h2 {
                 text-align: center;
@@ -80,6 +80,9 @@
                     align-items: center;
                     gap: 2rem;
                 }
+            }
+            > p {
+                text-align: center;
             }
         }
         .modal {
@@ -185,9 +188,19 @@
         }
     }
     &.admin-search {
-        .search-container {
-            gap: 1.6rem;
+        .list-wrap {
+            .search-container {
+                display: none;
+             }
+         }
+        > .list-wrap {
+            > .search-container {
+                display: flex;
+                gap: 1.6rem;
+            }
         }
+
+
     }
 }
 .video-grid {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import dynamoDB from '../aws/awsConfig';
+//import dynamoDB from '../aws/awsConfig';
 import InstructorsList from './lists/InstructorsList';
 import StudentsList from './lists/StudentsList';
 import PatientsList from './lists/PatientsList';
@@ -9,6 +9,8 @@ import usePatients from '../hooks/usePatients';
 import useVideos from '../hooks/useVideos';
 import VideoModal from './VideoModal';
 import '../style/HomePage.scss';
+import { fetchAuthSession } from 'aws-amplify/auth';
+
 
 const HomePage = () => {
   const [instructors, setInstructors] = useState([]);
@@ -27,19 +29,34 @@ const HomePage = () => {
   // Effect for fetching instructors
   useEffect(() => {
     const fetchInstructors = async () => {
-      const params = {
-        TableName: 'BarIlanGuidanceTree',
-        ProjectionExpression: 'therapist_code_leader',
-      };
-
       try {
-        const data = await dynamoDB.scan(params).promise();
-        const uniqueInstructors = [...new Set(data.Items.map(item => item.therapist_code_leader))];
+
+          const token = (await fetchAuthSession()).tokens?.idToken?.toString();
+          //console.log("token:", token)
+
+        const response = await fetch('https://uz5qtg0iu1.execute-api.us-east-1.amazonaws.com/test/fetchinstructors', {
+          method: 'GET',
+          headers: {
+            'Authorization': token,
+            'Content-Type': 'application/json'
+          },
+        });
+        //console.log("response:", response)
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch instructors');
+        }
+
+        const data = await response.json();
+        const uniqueInstructors = data.unique_instructors_codes || [];
         setInstructors(uniqueInstructors);
+
+
       } catch (error) {
         console.error('Error fetching instructors:', error);
       }
     };
+
     fetchInstructors();
   }, []);
 

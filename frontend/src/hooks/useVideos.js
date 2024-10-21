@@ -8,18 +8,30 @@ const useVideos = () => {
   const [videoList, setVideos] = useState([]);
   const [groupedVideos, setGroupedVideos] = useState({});
 
-  const fetchVideos = async (patientCode) => {
+  const fetchVideos = async (patientCode = null) => {
     const params = {
       TableName: 'BarIlanSessionsFiles',
-      FilterExpression: 'patient_code = :patientCode',
-      ExpressionAttributeValues: {
-        ':patientCode': patientCode,
-      },
     };
+  
+    if (patientCode) {
+      params.FilterExpression = 'patient_code = :patientCode';
+      params.ExpressionAttributeValues = {
+        ':patientCode': patientCode,
+      };
+    }
 
     try {
       const data = await dynamoDB.scan(params).promise();
-      const videoList = await Promise.all(data.Items.map(async (item) => {
+
+      const uniqueVideoList = data.Items.reduce((acc, current) => {
+        const isDuplicate = acc.find(video => video.fullVideoName === current.full_video_name);
+        if (!isDuplicate) {
+          acc.push(current);
+        }
+        return acc;
+      }, []);
+
+      const videoList = await Promise.all(uniqueVideoList.map(async (item) => {
         const metadata = await getVideoMetadata(item.file_key_to_s3);
         const signedUrl = await getSignedUrl(item.file_key_to_s3);
 

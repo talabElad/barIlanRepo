@@ -26,8 +26,13 @@ const AdminSearch = ({ handleStudentClick, handlePatientClick, handleVideoClick 
   const [videoTimes, setVideoTimes] = useState({});
 
   const handleSearch = async () => {
-    const fetchedResults = await queryData(selectedRole, searchTerm);
-    setResults(fetchedResults);
+    if (selectedRole === 'Videos') {
+      await fetchVideos('');
+      setResults(groupedVideos);
+    } else {
+      const fetchedResults = await queryData(selectedRole, searchTerm);
+      setResults(fetchedResults);
+    }
   };
   
   useEffect(() => {

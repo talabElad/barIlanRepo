@@ -2,9 +2,15 @@ import React, { useState } from 'react';
 import VideosListItems from '../ListItems/VideosListItems';
 
 const VideosList = ({ groupedVideos, onClickFromAdminVideo, onClickFromHomeVideo }) => {
+
   const [searchTerm, setSearchTerm] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+
+
+  if (!groupedVideos || Object.keys(groupedVideos).length === 0) {
+    return <div>No videos found</div>;
+  }
 
   // Function to filter videos by date range
   const filterByDateRange = (lastModified) => {
@@ -14,14 +20,22 @@ const VideosList = ({ groupedVideos, onClickFromAdminVideo, onClickFromHomeVideo
   };
 
   
-// Filtered videos by search term and date range
-const filteredVideos = groupedVideos ? Object.entries(groupedVideos).map(([sessionName, sessionVideos]) => ({
-  sessionName,
-  videos: sessionVideos.filter(video =>
-    video.fullVideoName?.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    filterByDateRange(video.lastModified)
-  ),
-})).filter(group => group.videos.length) : [];
+  // Filtered videos by search term and date range
+  const filteredVideos = Object.entries(groupedVideos).map(([sessionName, sessionVideos]) => {
+    // Ensure sessionVideos is an array before filtering
+    const videosArray = Array.isArray(sessionVideos) ? sessionVideos : [];
+
+    const filtered = videosArray.filter(video => {
+      const passesSearch = video?.fullVideoName?.toLowerCase().includes(searchTerm.toLowerCase());
+      const passesDate = filterByDateRange(video.lastModified);
+      return passesSearch && passesDate;
+    });
+
+    return {
+      sessionName,
+      videos: filtered
+    };
+  }).filter(group => group.videos.length > 0);
 
 
 
@@ -40,7 +54,7 @@ const filteredVideos = groupedVideos ? Object.entries(groupedVideos).map(([sessi
     <div className="list-wrap videos">
       <div className='title-wrap'>
         <h2>Videos</h2>
-        <span>({filteredVideos.length})</span>
+        <span>({filteredVideos[0]['videos'].length})</span>
       </div>
 
       <div className='search-container'>
@@ -59,7 +73,7 @@ const filteredVideos = groupedVideos ? Object.entries(groupedVideos).map(([sessi
           </div>
         </div>
       </div>
-      {searchTerm && filteredVideos.length !== groupedVideos.length && (
+      {searchTerm && filteredVideos.length !== Object.keys(groupedVideos).length && (
         <div className='filter-status'><p>Shown Filtered Results</p></div>
       )}
       <ul>
