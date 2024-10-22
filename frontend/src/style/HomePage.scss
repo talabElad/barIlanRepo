@@ -6,7 +6,7 @@
     &.homepage, &.admin-search {
         flex-direction: column;
         justify-content: flex-start;
-        height: 100%;
+        height: auto;
         padding: 6rem 8rem 4rem;
         .list-wrap {
             width: 102rem;
@@ -149,7 +149,16 @@
                     .video-details {
                         display: flex;
                         flex-wrap: wrap;
-                        justify-content: space-around;
+                        //justify-content: space-around;
+                        .lists-wrapper {
+                            flex: 1 100%;
+                            display: flex;
+                            justify-content: space-between;
+                            gap: 1rem;
+                            dl {
+                                flex: 0 1 50%;
+                            }
+                        }
                         h4 {
                             flex: 1 100%;
                             text-align: center;
@@ -172,17 +181,18 @@
             }
             .detail {
                 display: flex;
-                font-size: 1.5rem;
+                font-size: 1.4rem;
                 &:not(:last-child) {
                     border-bottom: 1px solid #cccccc52;
                 }
                 dt {
                     font-weight: 500;
-                    min-width: 15rem;
+                    min-width: 14rem;
                 }
                 dd {
                     font-weight: 400;
                     margin-inline-start: 0;
+                    @include ellip(2);
                 }
             }
         }

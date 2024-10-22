@@ -37,39 +37,47 @@ const VideoModal = ({ selectedVideo, setSelectedVideo, groupedVideos, selectedSe
               <div key={video.fileKey}>
                 {video.s3Url ? (
                   <>
+                    {console.log('video:', video)}
                     <video width="560" height="315" src={video.s3Url} controls onTimeUpdate={(e) => handleTimeUpdate(video.fileKey, e.target.currentTime)}></video>
                     <div className="video-details">
                       <h4>Session Details:</h4>
-                      <dl>
-                        <div className='detail'>
-                          <dt>Room Number:</dt>
-                          <dd>{video.meetingNum}</dd>
-                        </div>
-                        <div className='detail'>
-                          <dt>Meeting Number:</dt>
-                          <dd>{video.roomNum}</dd>
-                        </div>
-                        <div className='detail'>
-                          <dt>Patient Code:</dt>
-                          <dd>{video.patientCode}</dd>
-                        </div>
-                      </dl>
-                      <dl>
-                      {video.lastModified && video.lastModified !== 'unknown' && (
-                        <div className='detail'>
-                            <dt>Last Modified:</dt>
-                            <dd>{new Date(video.lastModified).toLocaleDateString('he-IL')}</dd>
-                        </div>
-                        )}
-                        <div className='detail'>
-                          <dt>Therapist Code:</dt>
-                          <dd>{video.therapistCode}</dd>
-                        </div>
-                        <div className='detail'>
-                          <dt>Unique Session Name:</dt>
-                          <dd>{video.uniqueSessionName}</dd>
-                        </div>
-                      </dl>
+                      <div className='lists-wrapper'>
+                        <dl>
+                          <div className='detail'>
+                            <dt>Unique Session Name:</dt>
+                            <dd>{video.uniqueSessionName}</dd>
+                          </div>
+                          <div className='detail'>
+                            <dt>Camera:</dt>
+                            <dd>{video.cameraName}</dd>
+                          </div>
+                          <div className='detail'>
+                            <dt>Meeting Number:</dt>
+                            <dd>{video.roomNum}</dd>
+                          </div>
+                          <div className='detail'>
+                            <dt>Room Number:</dt>
+                            <dd>{video.meetingNum}</dd>
+                          </div>
+                        </dl>
+                        <dl>
+                        {video.date && video.date !== 'unknown' && (
+                          <div className='detail'>
+                              <dt>Date:</dt>
+                              <dd>{new Date(video.date).toLocaleDateString('he-IL')}</dd>
+                          </div>
+                          )}
+                          <div className='detail'>
+                            <dt>Patient Code:</dt>
+                            <dd>{video.patientCode}</dd>
+                          </div>
+                          <div className='detail'>
+                            <dt>Therapist Code:</dt>
+                            <dd>{video.therapistCode}</dd>
+                          </div>
+                        </dl>
+                      </div>
+
                     </div>
                   </>
                 ) : (

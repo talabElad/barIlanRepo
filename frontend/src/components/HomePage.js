@@ -8,8 +8,8 @@ import useStudents from '../hooks/useStudents';
 import usePatients from '../hooks/usePatients';
 import useVideos from '../hooks/useVideos';
 import VideoModal from './VideoModal';
-import '../style/HomePage.scss';
 import { fetchAuthSession } from 'aws-amplify/auth';
+import '../style/HomePage.scss';
 
 
 const HomePage = () => {
@@ -31,10 +31,10 @@ const HomePage = () => {
     const fetchInstructors = async () => {
       try {
 
-          const token = (await fetchAuthSession()).tokens?.idToken?.toString();
+        const token = (await fetchAuthSession()).tokens?.idToken?.toString();
           //console.log("token:", token)
-
-        const response = await fetch('https://uz5qtg0iu1.execute-api.us-east-1.amazonaws.com/test/fetchinstructors', {
+        const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
+        const response = await fetch(apiUrl+'/fetchinstructors', {
           method: 'GET',
           headers: {
             'Authorization': token,

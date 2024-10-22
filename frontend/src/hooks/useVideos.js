@@ -1,67 +1,65 @@
 import { useState } from 'react';
-import dynamoDB from '../aws/awsConfig';
+import { fetchAuthSession } from 'aws-amplify/auth';
 import { groupVideosBySession } from '../utils/videoUtils';
-import { getVideoMetadata } from '../utils/getVideoMetadata';
-import { getSignedUrl } from '../utils/getSignedUrl';
 
 const useVideos = () => {
   const [videoList, setVideos] = useState([]);
   const [groupedVideos, setGroupedVideos] = useState({});
+  const [loading, setLoading] = useState(false); // Add a loading state for better UX
+  const [error, setError] = useState(null); // Add an error state
 
   const fetchVideos = async (patientCode = null) => {
-    const params = {
-      TableName: 'BarIlanSessionsFiles',
-    };
-  
-    if (patientCode) {
-      params.FilterExpression = 'patient_code = :patientCode';
-      params.ExpressionAttributeValues = {
-        ':patientCode': patientCode,
-      };
-    }
+    setLoading(true);
+    setError(null);
 
     try {
-      const data = await dynamoDB.scan(params).promise();
+      const token = (await fetchAuthSession()).tokens?.idToken?.toString();
+      const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
+      const fullUrl = `${apiUrl}/fetchvideos?patientCode=${patientCode}`;
 
-      const uniqueVideoList = data.Items.reduce((acc, current) => {
-        const isDuplicate = acc.find(video => video.fullVideoName === current.full_video_name);
-        if (!isDuplicate) {
-          acc.push(current);
+      const response = await fetch(fullUrl, {
+        method: 'GET',
+        headers: {
+          'Authorization': token,
+          'Content-Type': 'application/json',
         }
-        return acc;
-      }, []);
+      });
 
-      const videoList = await Promise.all(uniqueVideoList.map(async (item) => {
-        const metadata = await getVideoMetadata(item.file_key_to_s3);
-        const signedUrl = await getSignedUrl(item.file_key_to_s3);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch videos: ${response.statusText}`);
+      }
 
-        return {
-          fullVideoName: item.full_video_name,
-          fileKey: item.file_key_to_s3,
-          s3Url: signedUrl,
-          meetingNum: item.meeting_num,
-          roomNum: item.room_num,
-          cameraName: item.camera_name,
-          therapistCode: item.therapist_code,
-          patientCode: item.patient_code,
-          uniqueSessionName: item.unique_session_name,
-          lastModified: metadata ? metadata.LastModified : 'Unknown',
-        };
-        
-      }) || []);
+      const data = await response.json();
+      const videoList = data.unique_videos_list.map((item) => ({
+        fullVideoName: item.fullVideoName,
+        fileKey: item.fileKey,
+        s3Url: item.s3Url, // S3 signed URL for video access
+        meetingNum: item.meetingNum,
+        roomNum: item.roomNum,
+        cameraName: item.cameraName,
+        therapistCode: item.therapistCode,
+        patientCode: item.patientCode,
+        uniqueSessionName: item.uniqueSessionName,
+        date: item.date,
+        time: item.time,
+      }));
 
-      
       setVideos(videoList);
       console.log('Fetched videos:', videoList);
+
+      // Assuming you have a utility to group videos by session
       const grouped = groupVideosBySession(videoList);
       setGroupedVideos(grouped);
-
+      
     } catch (error) {
       console.error('Error fetching videos:', error);
+      setError(error.message); // Capture any errors for display
+    } finally {
+      setLoading(false);
     }
   };
 
-  return { videoList, fetchVideos, groupedVideos };
+  return { videoList, fetchVideos, groupedVideos, loading, error };
 };
 
 export default useVideos;
