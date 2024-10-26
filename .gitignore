@@ -21,4 +21,5 @@ amplifytools.xcconfig
 **.sample
 backend/.idea/
 .env
+.vscode/
 #amplify-do-not-edit-end
