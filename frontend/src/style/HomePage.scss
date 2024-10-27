@@ -6,11 +6,29 @@
     &.homepage, &.admin-search {
         flex-direction: column;
         justify-content: flex-start;
-        height: auto;
         padding: 6rem 8rem 4rem;
+        overflow-y: auto;
+        overflow-x: hidden;
+        height: calc(100vh - 42rem);
+        @include breakpoint(desktop-sm) {
+            padding: 2rem 4rem 3rem;
+            height: calc(100vh - 31rem);
+        }
+        @include breakpoint(tablet) {
+            padding: 3rem 4rem;
+        }
+        @include breakpoint(mobile) {
+            padding: 2rem;
+        }
         .list-wrap {
-            width: 102rem;
+            width: 134rem;
             margin: 0 auto;
+            @include breakpoint(desktop-sm) {
+                width: 110rem;
+            }
+            @include breakpoint(tablet) {
+                width: 100%;
+            }
             h1, h2 {
                 text-align: center;
             }
@@ -33,12 +51,25 @@
                     background-size: cover;
                     width: 100%;
                     height: 9rem;
+                    @include breakpoint(desktop-sm) {
+                        height: 6rem;
+                        background-size: contain;
+                        background-repeat: no-repeat;
+                        background-position: center;
+                    }
+                    @include breakpoint(mobile) {
+                        height: 5rem;
+                    }
                 }
             
                 .video-preview {
                     width: 4rem;
                     height: 4rem;
                     margin-right: 10px;
+                    @include breakpoint(desktop-sm) {
+                        width: 3rem;
+                        height: 3rem;
+                    }
                 }
             
                 &:hover {
@@ -49,6 +80,9 @@
                     width: 30rem;
                     box-shadow: 3px 3px 10px 4px #ddd;
                     gap: 1.6rem;
+                    @include breakpoint(mobile) {
+                        width: 100%;
+                    }
                     > span {
                         width: 100%;
                         text-align: center;
@@ -66,12 +100,33 @@
                 align-items: center;
                 gap: 0.8rem;
                 margin-bottom: 3.4rem;
+                @include breakpoint(desktop-sm) {
+                    margin-bottom: 3rem;
+                }
+                @include breakpoint(tablet) {
+                    margin-bottom: 2.4rem;
+                }
+                @include breakpoint(mobile) {
+                    margin-bottom: 2rem;
+                }
                 > h2 {
                     font-size: 3.4rem;
                     margin: 0;
+                    @include breakpoint(desktop-sm) {
+                        font-size: 3rem;
+                    }
+                    @include breakpoint(tablet) {
+                        font-size: 2.4rem;
+                    }
+                    @include breakpoint(mobile) {
+                        font-size: 2.1rem;
+                    }
                 }
                 > span {
                     font-size: 2.4rem;
+                    @include breakpoint(tablet) {
+                        font-size: 1.8rem;
+                    }
                 }
             }
             &.videos {
@@ -79,6 +134,14 @@
                     flex-direction: column;
                     align-items: center;
                     gap: 2rem;
+                    @include breakpoint(desktop-sm) {
+                        flex-direction: row;
+                        align-items: flex-end;
+                    }
+                    @include breakpoint(tablet) {
+                        flex-direction: column;
+                        align-items: center;
+                    }
                 }
             }
             > p {
@@ -96,6 +159,10 @@
             justify-content: center;
             align-items: center;
             z-index: 1;
+            @include breakpoint(mobile) {
+                box-sizing: border-box;
+                padding-inline: 1.6rem;
+            }
             .modal-content {
                 background-color: #fff;
                 padding: 2rem;
@@ -103,6 +170,10 @@
                 position: relative;
                 box-shadow: 0px 0px 10px 4px #ddd;
                 width: 70rem;
+                @include breakpoint(mobile) {
+                    width: 100%;
+                    height: calc(100vh - 12rem);
+                }
                 .close {
                     position: absolute;
                     top: 1rem;
@@ -149,14 +220,23 @@
                     .video-details {
                         display: flex;
                         flex-wrap: wrap;
-                        //justify-content: space-around;
                         .lists-wrapper {
                             flex: 1 100%;
                             display: flex;
                             justify-content: space-between;
                             gap: 1rem;
+                            @include breakpoint(mobile) {
+                                flex-direction: column;
+                                gap: 0;
+                            }
                             dl {
                                 flex: 0 1 50%;
+                                &:first-of-type {
+                                    margin-bottom: 0.8rem;
+                                }
+                                &:last-of-type {
+                                    margin-top: 0;
+                                }
                             }
                         }
                         h4 {
@@ -224,23 +304,64 @@
     display: flex;
     justify-content: center;
     margin-bottom: 3rem;
+    @include breakpoint(tablet) {
+        margin-bottom: 2rem;
+    }
+    @include breakpoint(mobile) {
+        max-width: 100%;
+    }
+    .free-text-item {
+        @include breakpoint(mobile) {
+            min-width: 100%;
+        }
+    }
     input, select {
         padding-inline: 1rem 2rem;
         padding-block: 1rem;
         border-radius: 2rem;
         font-size: 2rem;
         min-width: 30rem;
+        @include breakpoint(desktop-sm) {
+            font-size: 1.8rem;
+            min-width: 28rem;
+        }
+        @include breakpoint(tablet) {
+            min-width: 100%
+        }
+        @include breakpoint(mobile) {
+            min-width: 100%;
+            box-sizing: border-box;
+        }
     }
     .dates-wrap {
         display: flex;
         align-items: center;
         gap: 2.6rem;
+        @include breakpoint(tablet) {
+            gap: 5rem;
+        }
+        @include breakpoint(mobile) {
+            min-width: 100%;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.2rem;
+        }
         .date-item {
             display: flex;
             align-items: center;
             gap: 1rem;
+            @include breakpoint(desktop-sm) {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            @include breakpoint(mobile) {
+                min-width: 100%;
+            }
             label {
                 font-size: 1.8rem;
+                @include breakpoint(desktop-sm) {
+                    font-size: 1.6rem;
+                }
             }
         }
     }
