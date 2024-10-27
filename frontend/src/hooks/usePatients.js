@@ -25,9 +25,15 @@ const usePatients = () => {
       }
 
       const data = await response.json();
+      console.log('Fetched students data:', data);
 
       const patientCodes = data.unique_patients_codes || [];
       setPatients(patientCodes);
+
+      if (patientCodes.length === 0) {
+        console.warn(`No patients found for therapistCodeStudent: ${therapistCodeStudent}`);
+      }
+
     } catch (error) {
       console.error('Error fetching patients:', error);
     }

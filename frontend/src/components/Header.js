@@ -42,9 +42,9 @@ const Header = ({ isAuthenticated, onLogout, userName, userRole }) => {
       <nav>
         <ul>
           <li><Link to="/">Home</Link></li>
-          {userRole && userRole.includes('Admins') && ( // Check if user belongs to 'admin' group
+          {/* {userRole && userRole.includes('Admins') && (
             <li><Link to="/admin-search">Admin Search</Link></li>
-          )}
+          )} */}
         </ul>
       </nav>
     </header>

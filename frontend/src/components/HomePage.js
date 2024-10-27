@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-//import dynamoDB from '../aws/awsConfig';
+import React, { useState, useEffect, useMemo } from 'react';
 import InstructorsList from './lists/InstructorsList';
 import StudentsList from './lists/StudentsList';
 import PatientsList from './lists/PatientsList';
@@ -11,8 +10,7 @@ import VideoModal from './VideoModal';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import '../style/HomePage.scss';
 
-
-const HomePage = () => {
+const HomePage = ({ userRole, userCustomId }) => {
   const [instructors, setInstructors] = useState([]);
   const [selectedInstructor, setSelectedInstructor] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -26,51 +24,67 @@ const HomePage = () => {
   const { patients, fetchPatients } = usePatients();
   const { videoList, fetchVideos, groupedVideos } = useVideos();
 
-  // Effect for fetching instructors
   useEffect(() => {
-    const fetchInstructors = async () => {
-      try {
+    console.log('userRole:', userRole);
+    console.log('userCustomId:', userCustomId);
+  }, [userRole, userCustomId]);
 
-        const token = (await fetchAuthSession()).tokens?.idToken?.toString();
-          //console.log("token:", token)
-        const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
-        const response = await fetch(apiUrl+'/fetchinstructors', {
-          method: 'GET',
-          headers: {
-            'Authorization': token,
-            'Content-Type': 'application/json'
-          },
-        });
-        //console.log("response:", response)
+  // Memoize user roles to avoid recalculating on every render
+  const isAdmin = useMemo(() => userRole.includes('Admins'), [userRole]);
+  const isInstructor = useMemo(() => userRole.includes('Instructors'), [userRole]);
+  const isStudent = useMemo(() => userRole.includes('Students'), [userRole]);
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch instructors');
+  // Effect for fetching instructors (only for Admin users)
+  useEffect(() => {
+    if (isAdmin) {
+      const fetchInstructors = async () => {
+        try {
+          const token = (await fetchAuthSession()).tokens?.idToken?.toString();
+          const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
+          const response = await fetch(`${apiUrl}/fetchinstructors`, {
+            method: 'GET',
+            headers: {
+              Authorization: token,
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch instructors');
+          }
+
+          const data = await response.json();
+          const uniqueInstructors = data.unique_instructors_codes || [];
+          setInstructors(uniqueInstructors);
+        } catch (error) {
+          console.error('Error fetching instructors:', error);
         }
+      };
 
-        const data = await response.json();
-        const uniqueInstructors = data.unique_instructors_codes || [];
-        setInstructors(uniqueInstructors);
+      fetchInstructors();
+    }
+  }, [isAdmin]);
 
+  // Effect for fetching students (only for Instructor users)
+  useEffect(() => {
+    if (isInstructor && userCustomId) {
+      fetchStudents(userCustomId);
+    }
+  }, [isInstructor, userCustomId]);
 
-      } catch (error) {
-        console.error('Error fetching instructors:', error);
-      }
-    };
-
-    fetchInstructors();
-  }, []);
+  // Effect for fetching patients (only for Student users)
+  useEffect(() => {
+    if (isStudent && userCustomId) {
+      fetchPatients(userCustomId);
+    }
+  }, [isStudent, userCustomId]);
 
   // Effect for handling video tab setup
   useEffect(() => {
-
-    if (selectedVideo) {
-      if (groupedVideos[selectedSession] || groupedVideos['']) {
-        const sessionVideos = groupedVideos[selectedSession] || groupedVideos[''];
-        if (sessionVideos.length) {
-          setActiveTab(sessionVideos[0].fullVideoName);
-        }
-      } else {
-        console.warn(`No videos found for session: ${selectedSession}`);
+    if (selectedVideo && groupedVideos[selectedSession]) {
+      const sessionVideos = groupedVideos[selectedSession];
+      if (sessionVideos && sessionVideos.length) {
+        setActiveTab(sessionVideos[0].fullVideoName);
       }
     }
   }, [selectedVideo, groupedVideos, selectedSession]);
@@ -82,21 +96,24 @@ const HomePage = () => {
     }));
   };
 
-  const handleInstructorClick = (instructorCode) => {
+  const handleInstructorClick = async (instructorCode) => {
     setSelectedInstructor(instructorCode);
     setSelectedStudent(null);
     setSelectedPatient(null);
-    fetchStudents(instructorCode);
+    console.log('instructorCode:', instructorCode);
+    await fetchStudents(instructorCode);
   };
 
   const handleStudentClick = (studentCode) => {
     setSelectedStudent(studentCode);
     setSelectedPatient(null);
+    setSelectedVideo(null);
     fetchPatients(studentCode);
   };
 
   const handlePatientClick = (patientCode) => {
     setSelectedPatient(patientCode);
+    setSelectedVideo(null);
     fetchVideos(patientCode);
   };
 
@@ -109,16 +126,28 @@ const HomePage = () => {
     <div className="main-container homepage">
       {(selectedInstructor || selectedStudent || selectedVideo || selectedPatient) && (
         <div className="breadcrumbs">
-          <span onClick={() => { setSelectedInstructor(null); setSelectedStudent(null); setSelectedVideo(null); setSelectedPatient(null); }}>
+          <span onClick={() => { 
+            setSelectedInstructor(null); 
+            setSelectedStudent(null); 
+            setSelectedVideo(null); 
+            setSelectedPatient(null); 
+          }}>
             Home
           </span>
           {selectedInstructor && (
-            <span onClick={() => { setSelectedStudent(null); setSelectedVideo(null); setSelectedPatient(null); }}>
+            <span onClick={() => { 
+              setSelectedStudent(null); 
+              setSelectedPatient(null); 
+              setSelectedVideo(null); 
+            }}>
               / {selectedInstructor}
             </span>
           )}
           {selectedStudent && (
-            <span onClick={() => { setSelectedVideo(null); setSelectedPatient(null); }}>
+            <span onClick={() => { 
+              setSelectedPatient(null); 
+              setSelectedVideo(null); 
+            }}>
               / {selectedStudent}
             </span>
           )}
@@ -129,12 +158,35 @@ const HomePage = () => {
           )}
         </div>
       )}
-      {!selectedInstructor && <InstructorsList instructors={instructors} onClickFromHomeInstructor={handleInstructorClick} />}
-      {selectedInstructor && !selectedStudent && <StudentsList students={students} onClickFromHomeStudent={handleStudentClick} />}
-      {selectedStudent && !selectedPatient && <PatientsList patients={patients} onClickFromHomePatient={handlePatientClick} />}
-      {selectedPatient && <VideosList groupedVideos={groupedVideos} onClickFromHomeVideo={handleVideoClick} />}
-      {selectedVideo && <VideoModal selectedVideo={selectedVideo} setSelectedVideo={setSelectedVideo} groupedVideos={groupedVideos} selectedSession={selectedSession} activeTab={activeTab} setActiveTab={setActiveTab} handleTimeUpdate={handleTimeUpdate} />
-    }
+
+
+      {isAdmin && !selectedInstructor && (
+        <InstructorsList instructors={instructors} onClickFromHomeInstructor={handleInstructorClick} />
+      )}
+
+      {(isAdmin || isInstructor) && ((!selectedInstructor && isInstructor) || selectedInstructor) && !selectedStudent && (
+        <StudentsList students={students} onClickFromHomeStudent={handleStudentClick} />
+      )}
+
+      {(isAdmin || isInstructor || isStudent) && ((selectedStudent && !selectedPatient) || (isStudent && !selectedPatient)) && (
+        <PatientsList patients={patients} onClickFromHomePatient={handlePatientClick} />
+      )}
+
+      {(isAdmin || isInstructor || isStudent) && selectedPatient && (
+        <VideosList groupedVideos={groupedVideos} onClickFromHomeVideo={handleVideoClick} />
+      )}
+
+      {selectedVideo && (
+        <VideoModal
+          selectedVideo={selectedVideo}
+          setSelectedVideo={setSelectedVideo}
+          groupedVideos={groupedVideos}
+          selectedSession={selectedSession}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          handleTimeUpdate={handleTimeUpdate}
+        />
+      )}
 
     </div>
   );

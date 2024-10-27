@@ -17,6 +17,7 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState('');
   const [userRole, setUserRole] = useState('');
+  const [userCustomId, setuserCustomId] = useState('');
 
   useEffect(() => {
     const checkUserSession = async () => {
@@ -26,6 +27,7 @@ const App = () => {
           const session = await fetchAuthSession();
           if (session && session.tokens) {
             setUserName(session.tokens.idToken.payload.name);
+            setuserCustomId(session.tokens.idToken.payload['custom:id'] || []);
             setUserRole(session.tokens.idToken.payload['cognito:groups'] || []);
           }
           setIsAuthenticated(true);
@@ -54,7 +56,7 @@ const App = () => {
           <Route path="/" element={isAuthenticated ? <Navigate to="/homepage" /> : <Login />} />
           <Route
             path="/homepage"
-            element={isAuthenticated ? <HomePage isAuthenticated={isAuthenticated} userRole={userRole} /> : <Navigate to="/" />}
+            element={isAuthenticated ? <HomePage isAuthenticated={isAuthenticated} userRole={userRole} userCustomId={userCustomId} /> : <Navigate to="/" />}
           />
           <Route
             path="/admin-search"
