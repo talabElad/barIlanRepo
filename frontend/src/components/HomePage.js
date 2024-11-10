@@ -8,6 +8,7 @@ import usePatients from '../hooks/usePatients';
 import useVideos from '../hooks/useVideos';
 import VideoModal from './VideoModal';
 import { fetchAuthSession } from 'aws-amplify/auth';
+import Loader from './Loader';
 import '../style/HomePage.scss';
 
 const HomePage = ({ userRole, userCustomId }) => {
@@ -19,6 +20,11 @@ const HomePage = ({ userRole, userCustomId }) => {
   const [selectedSession, setSelectedSession] = useState(null);
   const [activeTab, setActiveTab] = useState(null);
   const [videoTimes, setVideoTimes] = useState({});
+
+  const [loadingInstructors, setLoadingInstructors] = useState(false);
+  const [loadingStudents, setLoadingStudents] = useState(false);
+  const [loadingPatients, setLoadingPatients] = useState(false);
+  const [loadingVideos, setLoadingVideos] = useState(false);
 
   const { students, fetchStudents } = useStudents();
   const { patients, fetchPatients } = usePatients();
@@ -38,6 +44,7 @@ const HomePage = ({ userRole, userCustomId }) => {
   useEffect(() => {
     if (isAdmin) {
       const fetchInstructors = async () => {
+        setLoadingInstructors(true);
         try {
           const token = (await fetchAuthSession()).tokens?.idToken?.toString();
           const apiUrl = process.env.REACT_APP_API_GETAWAY_URL;
@@ -58,6 +65,8 @@ const HomePage = ({ userRole, userCustomId }) => {
           setInstructors(uniqueInstructors);
         } catch (error) {
           console.error('Error fetching instructors:', error);
+        } finally {
+          setLoadingInstructors(false);
         }
       };
 
@@ -68,6 +77,7 @@ const HomePage = ({ userRole, userCustomId }) => {
   // Effect for fetching students (only for Instructor users)
   useEffect(() => {
     if (isInstructor && userCustomId) {
+      setLoadingStudents(true);
       fetchStudents(userCustomId);
     }
   }, [isInstructor, userCustomId]);
@@ -75,6 +85,7 @@ const HomePage = ({ userRole, userCustomId }) => {
   // Effect for fetching patients (only for Student users)
   useEffect(() => {
     if (isStudent && userCustomId) {
+      setLoadingPatients(true);
       fetchPatients(userCustomId);
     }
   }, [isStudent, userCustomId]);
@@ -100,21 +111,25 @@ const HomePage = ({ userRole, userCustomId }) => {
     setSelectedInstructor(instructorCode);
     setSelectedStudent(null);
     setSelectedPatient(null);
+    setLoadingStudents(true);
     console.log('instructorCode:', instructorCode);
     await fetchStudents(instructorCode);
+    setLoadingStudents(false);
   };
 
   const handleStudentClick = (studentCode) => {
     setSelectedStudent(studentCode);
     setSelectedPatient(null);
     setSelectedVideo(null);
-    fetchPatients(studentCode);
+    setLoadingPatients(true);
+    fetchPatients(studentCode).finally(() => setLoadingPatients(false));
   };
 
   const handlePatientClick = (patientCode) => {
     setSelectedPatient(patientCode);
     setSelectedVideo(null);
-    fetchVideos(patientCode);
+    setLoadingVideos(true);
+    fetchVideos(patientCode).finally(() => setLoadingVideos(false));
   };
 
   const handleVideoClick = (video) => {
@@ -161,19 +176,27 @@ const HomePage = ({ userRole, userCustomId }) => {
 
 
       {isAdmin && !selectedInstructor && (
-        <InstructorsList instructors={instructors} onClickFromHomeInstructor={handleInstructorClick} />
+        loadingInstructors ? <Loader /> : (
+          <InstructorsList instructors={instructors} onClickFromHomeInstructor={handleInstructorClick} />
+        )
       )}
 
       {(isAdmin || isInstructor) && ((!selectedInstructor && isInstructor) || selectedInstructor) && !selectedStudent && (
-        <StudentsList students={students} onClickFromHomeStudent={handleStudentClick} />
+        loadingStudents ? <Loader /> : (
+          <StudentsList students={students} onClickFromHomeStudent={handleStudentClick} />
+        )
       )}
 
       {(isAdmin || isInstructor || isStudent) && ((selectedStudent && !selectedPatient) || (isStudent && !selectedPatient)) && (
-        <PatientsList patients={patients} onClickFromHomePatient={handlePatientClick} />
+        loadingPatients ? <Loader /> : (
+          <PatientsList patients={patients} onClickFromHomePatient={handlePatientClick} />
+        )
       )}
 
       {(isAdmin || isInstructor || isStudent) && selectedPatient && (
-        <VideosList groupedVideos={groupedVideos} onClickFromHomeVideo={handleVideoClick} />
+        loadingVideos ? <Loader /> : (
+          <VideosList groupedVideos={groupedVideos} onClickFromHomeVideo={handleVideoClick} />
+        )
       )}
 
       {selectedVideo && (
