@@ -2,3 +2,5 @@ Flask
 boto3
 Flask-CORS
 watchdog
+pandas
+python-dotenv
